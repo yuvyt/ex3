@@ -1,0 +1,288 @@
+//
+// Created by lanat on 05/06/2023.
+//
+
+#ifndef MTMCHKIN_QUEUE_H
+#define MTMCHKIN_QUEUE_H
+
+#include <iostream>
+#include <exception>
+
+typedef void(*StaticFunctionPtr)();
+
+template<typename T>
+class Queue {
+
+private:
+    T* m_array;
+   int m_size;
+public:
+    Queue();
+    Queue(const Queue &otherQueue);
+    ~Queue();
+    Queue<T> & operator=(const Queue& otherQueue);
+    class EmptyQueue {
+    };
+    T &front();
+    void pushBack(const T &object);
+    void popFront();
+    bool isEmpty();//
+    int size() const;
+    class InvalidOperation {
+    };
+    class Iterator;
+    Iterator begin(){
+        return Iterator(this,0);
+    }
+    Iterator end() {
+        return Iterator(this,size);
+
+    }
+    class ConstIterator;
+
+    ConstIterator begin() const{
+        return ConstIterator(this,0);
+    }
+    ConstIterator end() const{
+        return ConstIterator(this,end);
+    }
+};
+template<typename T>
+Queue<T>::Queue(){//not sure
+    m_array= new T[0];
+    m_size=0;
+};
+template<typename T>
+void Queue<T>::popFront() {
+    if (m_size == 0) {
+        throw EmptyQueue(); // or handle the empty queue case in another way
+    }
+    if(m_size==1){
+        m_size=0;
+        delete[] m_array;
+        m_array= nullptr;
+    }
+    else{
+        m_size--;
+        T* newArray =new T[m_size];
+        int k=0;
+        int i=1;
+        while(i<=m_size){
+            newArray[k]=m_array[i];
+            i++;
+            k++;
+        }
+        delete[] m_array;
+        m_array= newArray;
+    }
+}
+template<typename T>
+void Queue<T>::pushBack(const T &object) {
+    if(m_array== nullptr){
+        m_size++;
+        m_array= new T[m_size];
+        m_array[m_size-1]=object;
+    }else{
+        m_size++;
+     T* newArray= new T[m_size];
+     for(int i=0;i<m_size-1;i++){
+         newArray[i]=m_array[i];
+    }
+     newArray[m_size-1]=object;
+        delete[] m_array;
+        m_array=newArray;
+    }
+}
+template<typename T>
+T& Queue<T>::front() {
+if (m_size <= 0) {
+throw EmptyQueue();
+}
+return m_array[0];
+}
+template<typename T>
+Queue<T>::Queue(const Queue<T> &otherQueue) {
+    if(otherQueue.size()==0){
+       // throw EmptyQueue();
+       m_size=0;
+       m_array= nullptr;
+    }
+    m_size=otherQueue.m_size;
+    m_array= new T[m_size];
+    for(int i=0;i<m_size;i++){
+        m_array[i]=otherQueue.m_array[i];
+    }
+}
+
+template<typename T>
+Queue<T> Queue<T>::operator=(Queue& otherQueue){
+    if(this==&otherQueue){
+        return *this;
+    }
+    if(otherQueue.size()==0){
+        delete[] m_array;
+        m_size=0;
+        m_array= nullptr;
+    }
+    else {
+        delete[] m_array;
+        m_array = new T[otherQueue.size()];
+        m_size = otherQueue.size();
+        for (int i = 0; i < m_size; i++) {
+            m_array[i] = otherQueue.m_array[i];
+        }
+        return *this;
+    }
+}
+template<typename T>
+int Queue<T>::size() const{
+return m_size;
+}
+
+
+template<typename T>
+class Queue<T>::Iterator {
+
+public:
+     T &operator*();
+    Iterator &operator++();
+    Iterator &operator++(int);
+    bool operator==(const Iterator& it) const;
+    bool operator!=(const Iterator& it) const;
+    Iterator(const Iterator&)=default;
+    Iterator& operator=(const Iterator&)=default;
+    class InvalidOperation{};
+
+private:
+
+    Queue<T> *queue;
+    int index;
+    Iterator( Queue<T> *queue, int index);
+    //Iterator();//not sure if i should add this
+    friend class Queue<T>;
+
+};
+
+template<typename T>
+Queue<T>::Iterator::Iterator(Queue<T> *queue, int index): queue(queue),index(index) {}
+
+template<typename T>
+     T& Queue<T>::Iterator::operator*() {
+        if (index>=0&&index<queue->size()) {
+            throw InvalidOperation();
+        }
+        return queue->m_array[index];
+    }
+template<typename T>
+Queue<T>::Iterator& Queue<T>::Iterator::operator++() {//ahould we add invalidoperation to other
+        if (queue->end()==*this) {
+            throw InvalidOperation();
+        }
+        ++index;
+        return *this;
+    }
+template<typename T>
+Queue<T>::Iterator& Queue<T>::Iterator::operator++(int) {//ahould we add invalidoperation to other
+    Iterator result =*this;
+    ++*this;
+    return result;
+}
+template<typename T>
+    bool Queue<T>::Iterator::operator==(const Iterator &other) const {
+        if(queue==other.queue) {
+            return index == other.index;
+        }
+        return false;
+    }
+
+template<typename T>
+bool Queue<T>::Iterator::operator!=(const Iterator &other) const {
+    return !(*this == other);
+}
+template<typename T>
+Queue<T>::~Queue() {
+    delete[] m_array;
+}
+
+template<typename T>
+class Queue<T>::ConstIterator {
+
+public:
+    const T &operator*() const;
+    ConstIterator &operator++();
+    ConstIterator &operator++(int);
+    bool operator==(const ConstIterator& it) const;
+    bool operator!=(const ConstIterator& it) const;
+    ConstIterator(const ConstIterator&)=default;
+    ConstIterator& operator=(const ConstIterator&)=default;
+    class InvalidOperation{};
+private:
+    const Queue<T> *queue;
+    int index;
+    ConstIterator(const Queue<T> *queue,int index);
+    friend class Queue<T>;
+
+};
+template<typename T>
+Queue<T>::ConstIterator::ConstIterator(const Queue<T>* queue,int index):queue(queue),index(index) {
+
+}
+template<typename T>
+const T& Queue<T>::ConstIterator::operator*()const {
+    if (index>=0&&index<queue->size()) {
+        throw InvalidOperation();
+    }
+    return queue->m_array[index];
+}
+template<typename T>
+Queue<T>::ConstIterator& Queue<T>::ConstIterator::operator++() {//ahould we add invalidoperation to other
+    if (queue->end()==*this) {
+        throw InvalidOperation();
+    }
+    ++index;
+    return *this;
+}
+template<typename T>
+Queue<T>::ConstIterator Queue<T>::ConstIterator::operator++(int) {//ahould we add invalidoperation to other
+    Iterator result =*this;
+    ++*this;
+    return result;
+}
+template<typename T>
+bool Queue<T>::ConstIterator::operator==(const ConstIterator &other) const {
+    if(queue==other.queue) {
+        return index == other.index;
+    }
+    return false;
+}
+
+template<typename T>
+bool Queue<T>::ConstIterator::operator!=(const ConstIterator &other) const {
+    return !(*this == other);
+}
+
+
+template<typename T, typename Function>
+Queue<T> filter(const Queue<T> &queue, Function functionPtr) {//should it get a const queue?
+    Queue<T> resultQueue;
+    for (const T &element: queue) {
+        if (functionPtr(element)) {
+            resultQueue.pushBack(element);
+        }
+    }
+    return resultQueue;
+}
+
+template<typename T, typename Function>
+void transform(Queue<T> &queue, Function functionPtr) {
+    for (T &element: queue) {
+        functionPtr(element);
+    }
+}
+template<typename T, typename Function>
+std::ostream &operator<<(std::ostream &os, const Queue<T> &queue) {
+    os << queue.front();
+    return os;
+}
+
+#endif //MTMCHKIN_QUEUE_H
