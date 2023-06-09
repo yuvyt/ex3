@@ -12,6 +12,7 @@ typedef void(*StaticFunctionPtr)();
 
 template<typename T>
 class Queue {
+
 private:
     struct Node {
         T data;
@@ -25,98 +26,263 @@ private:
     Node *m_rear;
 
 public:
-    Queue<T>(const Queue<T> &otherQueue) = default;
-//    class Full{};
-    class Empty {
+    Queue(int m_size = 0, Node *m_first = nullptr, Node *m_rear = nullptr) {
+        this->m_first = m_first;
+        this->m_size = m_size;
+        this->m_rear = m_first;
+    }
+    Queue(const Queue<T> &otherQueue);
+    class EmptyQueue {
     };
-
-    T& front() {
-        if (m_size <= 0) {
-            throw Empty();
-        }
-        return m_first->data;
-    }
-
-    void pushBack(const T& object) {
-        Node* newNode = new Node(object);
-        if (m_size==0){
-            m_first = newNode;
-        } else {
-            m_rear->next = newNode;
-            m_rear = newNode;
-        }
-    }
-    T& popFront(){
-        if (m_size == 0) {
-            throw Empty(); // or handle the empty queue case in another way
-        }
-        Node* temp = m_first; // Store a pointer to the first node
-        m_first = m_first->next; // Update the first pointer to the next node
-        delete temp; // Deallocate memory for the first node
-        m_size--; // Decrease the size of the queue
-    }
-    bool isEmpty(){
-        return (m_size==0);
-    }
-
-    int size(){
-        return m_size;
-    }
-    class iterator {
-    private:
-        Node* current;
-
-    public:
-        iterator(Node* node) : current(node) {}
-
-        T& operator*() const {
-            return current->data;
-        }
-
-        iterator& operator++() {
-            current = current->next;
-            return *this;
-        }
-
-        iterator operator++(int) {
-            iterator temp = *this;
-            current = current->next;
-            return temp;
-        }
-
-        bool operator==(const iterator& other) const {
-            return current == other.current;
-        }
-
-        bool operator!=(const iterator& other) const {
-            return !(*this == other);
-        }
+    T &front();
+    void pushBack(const T &object);
+    void popFront();
+    bool isEmpty();
+    int size() const;
+    void operator=(Queue& otherQueue);
+    class InvalidOperation {
     };
+    class Iterator;
+    Iterator begin(){
+        return Iterator(this,m_first);
+    }
+    Iterator end() {
+        return Iterator(this,m_rear->next);
 
-    iterator begin() {
-        return iterator(m_first);
+    }
+    class ConstIterator;
+
+    ConstIterator begin() const{
+        return ConstIterator(this,m_first);
+    }
+    ConstIterator end() const{
+        return ConstIterator(this,m_rear->next);
+    }
+};
+template<typename T>
+void Queue<T>::popFront() {
+    if (m_size == 0) {
+        throw EmptyQueue(); // or handle the empty queue case in another way
+    }
+    Node *temp = m_first; // Store a pointer to the first node
+    m_first = m_first->next; // Update the first pointer to the next node
+    delete temp; // Deallocate memory for the first node
+    m_size--; // Decrease the size of the queue
+}
+template<typename T>
+void Queue<T>::pushBack(const T &object) {
+    Node* newNode = nullptr;
+    try{
+        Node *newNode = new Node(object);
+    }catch(std::bad_alloc()){
+        delete newNode;
+        throw;//???
+    }
+    if (m_size == 0) {
+        m_first = newNode;
+        m_rear = newNode;
+    } else {
+        m_rear->next = newNode;
+        m_rear = newNode;
+    }
+    m_size++;
+}
+template<typename T>
+T& Queue<T>::front() {
+if (m_size <= 0) {
+throw EmptyQueue();
+}
+return m_first->data;
+}
+template<typename T>
+Queue<T>::Queue(const Queue<T> &otherQueue) {
+    if(otherQueue.isEmpty()){//is it good
+        throw EmptyQueue();
+    }
+    m_size=otherQueue.m_size;
+    m_first=m_rear= nullptr;
+    Node* currNode = otherQueue.m_first;
+    try {
+        while (currNode != nullptr) {
+            pushBack(currNode->data);
+            currNode = currNode->next;
+        }
+    } catch (std::bad_alloc&) {
+        Node* temp = m_first;
+        while (temp != nullptr) {
+            Node* nextNode = temp;
+            temp=temp->next;
+            delete nextNode;
+        }
+        m_first = nullptr;
+        m_rear = nullptr;
+        m_size = 0;
+        throw;
     }
 
-    iterator end() {
-        return iterator(nullptr);
-    }
+}
 
+template<typename T>
+void Queue<T>::operator=(Queue& otherQueue){
+    if(this==&otherQueue){
+        return *this;
+    }
+    Queue<T> newQueue;
+    try{
+        newQueue=otherQueue;
+    }catch(std::bad_alloc()){
+        delete newQueue;
+    }
+    this= newQueue;
+}
+template<typename T>
+int Queue<T>::size() const{
+return m_size;
+}
+template<typename T>
+bool Queue<T>::isEmpty(){//i think we should remove this function
+return (m_size == 0);
+}
+
+template<typename T>
+class Queue<T>::Iterator {
+
+public:
+     T &operator*();
+    Iterator &operator++();
+    Iterator &operator++(int);
+    bool operator==(const Iterator& it) const;
+    bool operator!=(const Iterator& it) const;
+    Iterator(const Iterator&)=default;
+    Iterator& operator=(const Iterator&)=default;
+    class InvalidOperation{};
+
+private:
+
+    Queue<T> *queue;
+    Node* current;
+    Iterator( Queue<T> *queue, Node* current):queue(queue) , current(current){}
+    Iterator();//not sure if i should add this
+    friend class Queue<T>;
 
 };
-template<typename T,typename Function>
-Queue<T> filter(const Queue<T>& queue, Function functionPtr) {
+
+template<typename T>
+Queue<T>::Iterator::Iterator() : queue(nullptr) {}
+
+template<typename T>
+     T& Queue<T>::Iterator::operator*() {
+        if (current== nullptr) {
+            throw InvalidOperation();
+        }
+        return this->current->data;
+    }
+template<typename T>
+Queue<T>::Iterator& Queue<T>::Iterator::operator++() {//ahould we add invalidoperation to other
+        if (current == nullptr) {
+            throw InvalidOperation();
+        }
+        current = current->next;
+        return *this;
+    }
+template<typename T>
+Queue<T>::Iterator& Queue<T>::Iterator::operator++(int) {//ahould we add invalidoperation to other
+    Iterator result =*this;
+    ++*this;
+    return result;
+}
+template<typename T>
+    bool Queue<T>::Iterator::operator==(const Iterator &other) const {
+        if(this->queue==other.queue) {
+            return current == other.current;
+        }
+        return false;
+    }
+
+template<typename T>
+bool Queue<T>::Iterator::operator!=(const Iterator &other) const {
+    return !(*this == other);
+}
+
+
+template<typename T>
+class Queue<T>::ConstIterator {
+
+public:
+    const T &operator*() const;
+    ConstIterator &operator++();
+    ConstIterator &operator++(int);
+    bool operator==(const ConstIterator& it) const;
+    bool operator!=(const ConstIterator& it) const;
+    ConstIterator(const ConstIterator&)=default;
+    ConstIterator& operator=(const ConstIterator&)=default;
+    class InvalidOperation{};
+private:
+    const Queue<T> *queue;
+    const Node* current;
+    ConstIterator(const Queue<T> *queue,const Node* current):queue(queue),current(current);
+    ConstIterator();//not sure if i should add this
+    friend class Queue<T>;
+
+};
+
+template<typename T>
+const T& Queue<T>::ConstIterator::operator*()const {
+    if (current== nullptr) {
+        throw InvalidOperation();
+    }
+    return this->current->data;
+}
+template<typename T>
+Queue<T>::ConstIterator& Queue<T>::ConstIterator::operator++() {//ahould we add invalidoperation to other
+    if (current == nullptr) {
+        throw InvalidOperation();
+    }
+    current = current->next;
+    return *this;
+}
+template<typename T>
+Queue<T>::ConstIterator& Queue<T>::ConstIterator::operator++(int) {//ahould we add invalidoperation to other
+    Iterator result =*this;
+    ++*this;
+    return result;
+}
+template<typename T>
+bool Queue<T>::ConstIterator::operator==(const ConstIterator &other) const {
+    if(this->queue==other.queue) {
+        return current == other.current;
+    }
+    return false;
+}
+
+template<typename T>
+bool Queue<T>::ConstIterator::operator!=(const ConstIterator &other) const {
+    return !(*this == other);
+}
+
+
+template<typename T, typename Function>
+Queue<T> filter(const Queue<T> &queue, Function functionPtr) {//should it get a const queue?
     Queue<T> resultQueue;
-    for (const T& element : queue){
+    for (const T &element: queue) {
         if (functionPtr(element)) {
             resultQueue.pushBack(element);
         }
     }
     return resultQueue;
 }
+
 template<typename T, typename Function>
-void transform(Queue<T>& queue, Function functionPtr) {
-    for (T& element : queue) {
-        element = functionPtr(element);
+void transform(Queue<T> &queue, Function functionPtr) {
+    for (T &element: queue) {
+        functionPtr(element);
     }
 }
+
+template<typename T, typename Function>
+std::ostream &operator<<(std::ostream &os, const Queue<T> &queue) {
+    os << queue.front();
+    return os;
+}
+
 #endif //MTMCHKIN_QUEUE_H
