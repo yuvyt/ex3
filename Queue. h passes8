@@ -18,9 +18,18 @@ private:
     struct Node {
         T data;
         Node *next;
-
+        /*c'tor for the struct Node.
+        *@param: value: the data for the node
+        * 
+        */
         Node(const T &value) : data(value), next(nullptr) {}
 
+        /*
+        *overloading operator= with a Node object, 
+        * so it will be another pointer to the other Node
+        * 
+        * @param: otherNode: node to be
+        */
         Node& operator=(const Node& otherNode) {
             if (this != &otherNode) {
                 this->data = otherNode.data;
@@ -35,27 +44,92 @@ private:
     Node *m_rear;
 
 public:
-    Queue(int m_size = 0, Node *m_first = nullptr, Node *m_rear = nullptr) {
-        this->m_first = m_first;
-        this->m_size = m_size;
-        this->m_rear = m_first;
+    
+    /*c'tor for the class queue.
+    *initilaizing the fields to their default values
+    * 
+    */
+    Queue()
+    {
+        this->m_first = nullptr;
+        this->m_size = 0;
+        this->m_rear = nullptr;
     }
+    
+    /*c'tor for the class queue.
+    *@param: m_first: size for ne
+    * 
+    */
+    // Queue(Node *m_first = nullptr, Node *m_rear = nullptr) { //int m_size = 0, 
+    //     this->m_first = m_first;
+    //     this->m_size = 0;
+    //     Node count = m_first;
+    //     while (count != nullptr)
+    //     {
+    //         m_size++;
+    //         count=count->next;
+    //     }
+    //     this->m_rear = m_rear;
+    // }
+
+    /*copy c'tor for the class queue.
+    *initilaizing the fields to a copy of the values that were in the wanted queue
+    * 
+    * @param: otherQueue: queue to copy
+    */
     Queue(const Queue<T> &otherQueue);
+    
+    /*class EmptyQueue to throw when encoutring an empty queue is a problem
+    */
     class EmptyQueue {
     };
+
+    /*front returns the value of the first element in the queue
+    */
     T &front();
+
+    /*pushBack adds another element to the end of the queue
+    * param: object: a T object to add
+    */
     void pushBack(const T &object) ;
+
+    /*removes the first object of the queue
+    */
     void popFront();
+
+    /*returns if the queue has no elements
+    */
     bool isEmpty() const;
+
+    /*returns size of the queue
+    */
     int size() const;
+
+    /*d'tor for the queue
+    */
     ~Queue();
+
+    /*
+    * overloading operator= with a Queue object, 
+    * makes the current queue identical in content to the recived queue
+    * 
+    * @param: otherQueue: queue to imitate
+    */
     Queue<T>& operator=(Queue& otherQueue);
+
+    /*class InvalidOperation to throw when operating incurrectly on a nullptr
+    */
     class InvalidOperation {
     };
     class Iterator;
+
+    /*returns the first node of a queue as an Iterator objects
+    */
     Iterator begin(){
         return Iterator(this,m_first);
     }
+    /*returns the after the last node of a queue as an Iterator objects
+    */
     Iterator end() {
         return Iterator(this,nullptr);
         // return Iterator(this,m_rear->next);
@@ -63,14 +137,20 @@ public:
     }
     class ConstIterator;
 
+    /*returns the first node of a const queue as an Iterator objects
+    */
     ConstIterator begin() const{
         return ConstIterator(this,m_first);
     }
+    /*returns the after the last node of a const queue as an Iterator objects
+    */
     ConstIterator end() const{
         return ConstIterator(this,m_rear->next);
     }
 };
 template<typename T>
+
+
 void Queue<T>::popFront() {
     if (m_size == 0) {
         throw EmptyQueue(); // or handle the empty queue case in another way
@@ -82,14 +162,8 @@ void Queue<T>::popFront() {
 }
 template<typename T>
 void Queue<T>::pushBack(const T &object) {
-    //Node* newNode = nullptr;
-    //try{
     T toAdd = object;
     Node *newNode = new Node(toAdd);
-    //}catch(std::bad_alloc()){
-    //    delete newNode;
-   //     throw;//???
-   // }
     if (m_size == 0) {
         m_first = newNode;
         m_rear = newNode;
@@ -101,15 +175,15 @@ void Queue<T>::pushBack(const T &object) {
 }
 template<typename T>
 T& Queue<T>::front() {
-if (m_size <= 0) {
-throw EmptyQueue();
-}
-return m_first->data;
+    if (m_size <= 0) {
+        throw EmptyQueue();
+    }
+    return m_first->data;
 }
 
 template<typename T>
 bool Queue<T>::isEmpty() const {//i think we should remove this function
-return (m_size == 0);
+    return (m_size == 0);
 }
 
 
@@ -182,30 +256,54 @@ Queue<T>& Queue<T>::operator=(Queue& otherQueue){
 }
 template<typename T>
 int Queue<T>::size() const{
-return m_size;
+    return m_size;
 }
 
 
 template<typename T>
 class Queue<T>::Iterator {
 
-public:
-    T &operator*();
-    Iterator &operator++();
-    Iterator &operator++(int);
-    bool operator==(const Iterator& it) const;
-    bool operator!=(const Iterator& it) const;
-    Iterator(const Iterator&)=default;
-    Iterator& operator=(const Iterator&)=default;
-    class InvalidOperation{};
+    public:
+        /*overload operator* for class iterator
+        */
+        T &operator*();
 
-private:
+        /*overload operator++ for class iterator
+        */
+        Iterator &operator++();
 
-    Queue<T> *queue;
-    Node* current;
-    Iterator( Queue<T> *queue, Node* current):queue(queue) , current(current){}
-    Iterator();//not sure if i should add this
-    friend class Queue<T>;
+        /*overload operator++ (int) for the postfixx for class iterator
+        */
+        Iterator &operator++(int);
+
+        /*overload operator== for class iterator
+        * compares the places in the queue
+        * param: it: placment to compare with
+        */
+        bool operator==(const Iterator& it) const;
+
+        /*overload operator!= for class iterator
+        * compares the places in the queue
+        * param: it: placment to compare with
+        */
+        bool operator!=(const Iterator& it) const;
+
+        Iterator(const Iterator&)=default;
+        Iterator& operator=(const Iterator&)=default;
+        class InvalidOperation{};
+
+    private:
+
+        Queue<T> *queue;
+        Node* current;
+
+        /*c'tor for Iterator
+        * param: queue: queue to iterate on
+        * param: current: current node on queue
+        */
+        Iterator(Queue<T> *queue, Node* current):queue(queue) , current(current){}
+        Iterator();//not sure if i should add this
+        friend class Queue<T>;
 
 };
 
@@ -251,17 +349,40 @@ template<typename T>
 class Queue<T>::ConstIterator {
 
     public:
+        /*overload operator* for class ConstIterator
+        */
         const T &operator*() const;
+        /*overload operator++ for class ConstIterator
+        */
         ConstIterator &operator++();
+
+        /*overload operator++ (int) for the postfixx for class ConstIterator
+        */
         ConstIterator &operator++(int);
+
+        /*overload operator== for class ConstIterator
+        * compares the places in the queue
+        * param: it: placment to compare with
+        */
         bool operator==(const ConstIterator& it) const;
+
+        /*overload operator!= for class ConstIterator
+        * compares the places in the queue
+        * param: it: placment to compare with
+        */
         bool operator!=(const ConstIterator& it) const;
         ConstIterator(const ConstIterator&)=default;
         ConstIterator& operator=(const ConstIterator&)=default;
         class InvalidOperation{};
     private:
+
         const Queue<T> *queue;
         const Node* current;
+
+        /*c'tor for ConstIterator
+        * param: queue: queue to iterate on
+        * param: current: current node on queue
+        */
         ConstIterator(const Queue<T> *queue,const Node* current):queue(queue),current(current) {};
         ConstIterator();//not sure if i should add this
         friend class Queue<T>;
@@ -303,6 +424,11 @@ bool Queue<T>::ConstIterator::operator!=(const ConstIterator &other) const {
 }
 
 
+/*filter  function for queue
+* filtering the content of the queue according to a certine function
+* param: queue: queue to filter
+* param: functionPtr: function to filter by
+*/
 template<typename T, typename Function>
 Queue<T> filter(const Queue<T> &queue, Function functionPtr) {//should it get a const queue?
     Queue<T> resultQueue;
@@ -314,6 +440,11 @@ Queue<T> filter(const Queue<T> &queue, Function functionPtr) {//should it get a 
     return resultQueue;
 }
 
+/*transform function for queue
+* changes the content of the queue according to a certine function
+* param: queue: queue to filter
+* param: functionPtr: function to filter by
+*/
 template<typename T, typename Function>
 void transform(Queue<T> &queue, Function functionPtr) {
     for (T &element: queue) {
@@ -321,6 +452,10 @@ void transform(Queue<T> &queue, Function functionPtr) {
     }
 }
 
+/*overloading << to now print out the front of the queue
+* param: os: ostream
+* param: queue: queue to print
+*/
 template<typename T, typename Function>
 std::ostream &operator<<(std::ostream &os, const Queue<T> &queue) {
     os << queue.front();
