@@ -12,16 +12,20 @@ HealthPoints::HealthPoints(int maxHPInput)//checked
     this->m_currentHp = maxHPInput;
 }
 
-HealthPoints::HealthPoints(
-        const HealthPoints &healthPointsToCopy)// i don't know weather it should be default or like this
-{
+HealthPoints::HealthPoints(const HealthPoints &healthPointsToCopy) {
     this->m_currentHp = healthPointsToCopy.m_currentHp;
     this->m_maxHp = healthPointsToCopy.m_maxHp;
 }
 
-HealthPoints HealthPoints::operator+( int numOfHpPoints) const //checked
+HealthPoints &HealthPoints::operator=(const HealthPoints &healthPointsToCopy) {
+    this->m_currentHp = healthPointsToCopy.m_currentHp;
+    this->m_maxHp = healthPointsToCopy.m_maxHp;
+    return *this;
+}
+
+HealthPoints HealthPoints::operator+(int numOfHpPoints) const //checked
 {
-    HealthPoints result=*this;
+    HealthPoints result = *this;
     result += numOfHpPoints;
     return result;
 }
@@ -31,7 +35,7 @@ HealthPoints operator+(int number, const HealthPoints &healthPoints) //checked
     return healthPoints + number;
 }
 
-HealthPoints HealthPoints::operator-(const int numOfHpPoints)  {
+HealthPoints HealthPoints::operator-(const int numOfHpPoints) {
     return *this + (-numOfHpPoints);
 }
 
@@ -53,7 +57,9 @@ HealthPoints &HealthPoints::operator-=(const int numOfHpPoints) {
 }
 
 HealthPoints &HealthPoints::operator=(const int numOfHpPoints) {
-
+ if(numOfHpPoints<=0){
+     throw InvalidArgument();
+ }
     this->m_maxHp = numOfHpPoints;
     this->m_currentHp = numOfHpPoints;
     return *this;
