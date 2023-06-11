@@ -17,7 +17,7 @@ public:
 
     HealthPoints(int maxHP = 100);
     HealthPoints(const HealthPoints& healthPointsToCopy);
-    HealthPoints&operator=(const HealthPoints& healthPointsToCopy)=default;
+    HealthPoints&operator=(const HealthPoints& healthPointsToCopy);
     class InvalidArgument : public std::exception
     {
     public:
@@ -60,5 +60,9 @@ private:
     int m_currentHp;
     int m_maxHp;
 };
-HealthPoints operator+(const int numOfHpPoints,  const HealthPoints& healthPoint);
+HealthPoints operator+(const int numOfHpPoints,  const HealthPoints& healthPoint);//check
+
+
+bool operator==(int number, const HealthPoints &healthPoints);
+
 #endif
