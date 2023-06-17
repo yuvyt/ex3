@@ -1,6 +1,5 @@
 #include "HealthPoints.h"
 #include <iostream>
-#include <exception>
 
 
 HealthPoints::HealthPoints(int maxHPInput)//checked
@@ -8,24 +7,20 @@ HealthPoints::HealthPoints(int maxHPInput)//checked
     if (maxHPInput <= 0) {
         throw HealthPoints::InvalidArgument();
     }
-    this->m_maxHp = maxHPInput;
-    this->m_currentHp = maxHPInput;
+    this->m_maxHealthpoints = maxHPInput;
+    this->m_currentHealthpoints = maxHPInput;
 }
 
-HealthPoints::HealthPoints(const HealthPoints &healthPointsToCopy) {
-    this->m_currentHp = healthPointsToCopy.m_currentHp;
-    this->m_maxHp = healthPointsToCopy.m_maxHp;
-}
-
-HealthPoints &HealthPoints::operator=(const HealthPoints &healthPointsToCopy) {
-    this->m_currentHp = healthPointsToCopy.m_currentHp;
-    this->m_maxHp = healthPointsToCopy.m_maxHp;
-    return *this;
-}
-
-HealthPoints HealthPoints::operator+(int numOfHpPoints) const //checked
+HealthPoints::HealthPoints(
+        const HealthPoints &healthPointsToCopy)
 {
-    HealthPoints result = *this;
+    this->m_currentHealthpoints = healthPointsToCopy.m_currentHealthpoints;
+    this->m_maxHealthpoints = healthPointsToCopy.m_maxHealthpoints;
+}
+
+HealthPoints HealthPoints::operator+( int numOfHpPoints) const //checked
+{
+    HealthPoints result=*this;
     result += numOfHpPoints;
     return result;
 }
@@ -35,18 +30,18 @@ HealthPoints operator+(int number, const HealthPoints &healthPoints) //checked
     return healthPoints + number;
 }
 
-HealthPoints HealthPoints::operator-(const int numOfHpPoints) {
+HealthPoints HealthPoints::operator-(const int numOfHpPoints)  {
     return *this + (-numOfHpPoints);
 }
 
 HealthPoints &HealthPoints::operator+=(const int numOfHpPoints) {
-    int newNumOfPoints = this->m_currentHp + numOfHpPoints;
-    if (newNumOfPoints > this->m_maxHp) {
-        this->m_currentHp = this->m_maxHp;
+    int newNumOfPoints = this->m_currentHealthpoints + numOfHpPoints;
+    if (newNumOfPoints > this->m_maxHealthpoints) {
+        this->m_currentHealthpoints = this->m_maxHealthpoints;
     } else if (newNumOfPoints <= 0) {
-        this->m_currentHp = 0;
+        this->m_currentHealthpoints = 0;
     } else {
-        this->m_currentHp = newNumOfPoints;
+        this->m_currentHealthpoints = newNumOfPoints;
     }
     return *this;
 }
@@ -57,23 +52,23 @@ HealthPoints &HealthPoints::operator-=(const int numOfHpPoints) {
 }
 
 HealthPoints &HealthPoints::operator=(const int numOfHpPoints) {
- if(numOfHpPoints<=0){
-     throw InvalidArgument();
- }
-    this->m_maxHp = numOfHpPoints;
-    this->m_currentHp = numOfHpPoints;
+if(numOfHpPoints<=0){
+    throw InvalidArgument();
+}
+    this->m_maxHealthpoints = numOfHpPoints;
+    this->m_currentHealthpoints = numOfHpPoints;
     return *this;
 }
 
 bool HealthPoints::operator==(const HealthPoints &otherHealthPoints) const {
-    if (this->m_currentHp == otherHealthPoints.m_currentHp) {
+    if (this->m_currentHealthpoints == otherHealthPoints.m_currentHealthpoints) {
         return true;
     }
     return false;
 }
 
 bool HealthPoints::operator==(const int numOfHpPoints) const {
-    if (this->m_currentHp == numOfHpPoints) {
+    if (this->m_currentHealthpoints == numOfHpPoints) {
         return true;
     }
     return false;
@@ -88,7 +83,7 @@ bool HealthPoints::operator!=(const HealthPoints &otherHealthPoints) const {
 }
 
 bool HealthPoints::operator!=(const int numOfHpPoints) const {
-    if (this->m_currentHp != numOfHpPoints) {
+    if (this->m_currentHealthpoints != numOfHpPoints) {
         return true;
     }
     return false;
@@ -99,14 +94,14 @@ bool operator!=(int number, const HealthPoints &healthPoints) {
 }
 
 bool HealthPoints::operator>=(const HealthPoints &otherHealthPoints) const {
-    if (this->m_currentHp > otherHealthPoints.m_currentHp || *this == otherHealthPoints) {
+    if (this->m_currentHealthpoints > otherHealthPoints.m_currentHealthpoints || *this == otherHealthPoints) {
         return true;
     }
     return false;
 }
 
 bool HealthPoints::operator>=(const int numOfHpPoints) const {
-    if (this->m_currentHp >= numOfHpPoints) {
+    if (this->m_currentHealthpoints >= numOfHpPoints) {
         return true;
     }
     return false;
@@ -117,14 +112,14 @@ bool operator>=(int number, const HealthPoints &healthPoints) {
 }
 
 bool HealthPoints::operator<=(const HealthPoints &otherHealthPoints) const {
-    if (this->m_currentHp < otherHealthPoints.m_currentHp || *this == otherHealthPoints) {
+    if (this->m_currentHealthpoints < otherHealthPoints.m_currentHealthpoints || *this == otherHealthPoints) {
         return true;
     }
     return false;
 }
 
 bool HealthPoints::operator<=(const int numOfHpPoints) const {
-    if (this->m_currentHp <= numOfHpPoints) {
+    if (this->m_currentHealthpoints <= numOfHpPoints) {
         return true;
     }
     return false;
@@ -139,7 +134,7 @@ bool HealthPoints::operator<(const HealthPoints &otherHealthPoints) const {
 }
 
 bool HealthPoints::operator<(const int numOfHpPoints) const {
-    if (this->m_currentHp < numOfHpPoints) {
+    if (this->m_currentHealthpoints < numOfHpPoints) {
         return true;
     }
     return false;
@@ -154,7 +149,7 @@ bool HealthPoints::operator>(const HealthPoints &otherHealthPoints) const {
 }
 
 bool HealthPoints::operator>(const int numOfHpPoints) const {
-    if (this->m_currentHp > numOfHpPoints) {
+    if (this->m_currentHealthpoints > numOfHpPoints) {
         return true;
     }
     return false;
@@ -165,6 +160,6 @@ bool operator>(int number, const HealthPoints &healthPoints) {
 }
 
 std::ostream &operator<<(std::ostream &os, const HealthPoints &healthPoints) {
-    os << healthPoints.m_currentHp << "(" << healthPoints.m_maxHp << ")";;
+    os << healthPoints.m_currentHealthpoints << "(" << healthPoints.m_maxHealthpoints << ")";
     return os;
 }
