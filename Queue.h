@@ -99,10 +99,6 @@ public:
     */
     void popFront();
 
-    /*returns if the queue has no elements
-    */
-    bool isEmpty() const;
-
     /*returns size of the queue
     */
     int size() const;
@@ -168,6 +164,9 @@ void Queue<T>::popFront() {
     m_first = m_first->next;
     delete temp;
     m_size--;
+    if (m_size == 0) {
+        m_rear = nullptr;
+    }
 }
 
 template<typename T>
@@ -195,18 +194,6 @@ T &Queue<T>::front() const {
     return m_first->data;
 }
 
-//template<typename T>
-//const T& Queue<T>::operator->() {
-//    if (m_size <= 0) {
-//        throw EmptyQueue();
-//    }
-//    return *this;
-//}
-
-template<typename T>
-bool Queue<T>::isEmpty() const {//i think we should remove this function
-    return (m_size == 0);
-}
 
 
 template<typename T>
@@ -221,14 +208,12 @@ Queue<T>::~Queue() {
 template<typename T>
 Queue<T>::Queue(const Queue<T> &otherQueue) {
 
-    //m_size=otherQueue.m_size;
     m_size = 0;
     m_first = nullptr;
     m_rear = nullptr;
     Node *currNode = otherQueue.m_first;
     T toAdd;
-    while (currNode != nullptr)
-    {
+    while (currNode != nullptr) {
         try {
             toAdd = currNode->data;
             pushBack(toAdd);
@@ -237,7 +222,7 @@ Queue<T>::Queue(const Queue<T> &otherQueue) {
             while (m_size) {
                 popFront();
             }
-            delete this;
+//            delete this;
             throw e;
         }
         currNode = currNode->next;
@@ -247,27 +232,37 @@ Queue<T>::Queue(const Queue<T> &otherQueue) {
 
 template<typename T>
 Queue<T> &Queue<T>::operator=(const Queue<T> &otherQueue) {
+
     if (this == &otherQueue) {
         return *this;
     }
+
     Queue<T> newQueue(*this);//copy the current queue so if something went wrong in the assigment i return it as it was
-    while (m_size) {//delte the curr nodes of the this queue
+    while (m_size) {//delete the curr nodes of the this queue
         popFront();
     }
-    for (Queue<T>::ConstIterator it = otherQueue.begin(); it != otherQueue.end(); ++it) {//use iterators in order to go over the nodes of otherqueie
+
+    for (Queue<T>::ConstIterator it = otherQueue.begin(); it != otherQueue.end(); ++it) {
+        ////use iterators in order to go over the nodes of otherquue
         try {
+
             pushBack(*it);//try to push the nodes into this queue
 
-        } catch (std::bad_alloc &e) {//if pushback threw a badalloc i catch
+        } catch (std::bad_alloc &e) {
+            //if pushback threw a badalloc i catch
+            while (m_size) {//delte the curr nodes of the this queue
+                popFront();
+            }
             this->m_size = newQueue.m_size;//return all the members as it was
             this->m_first = newQueue.m_first;
             this->m_rear = newQueue.m_rear;
-            delete newQueue;//not sure
             throw e;
+
         }
     }
     return *this;
 }
+
 
 template<typename T>
 int Queue<T>::size() const {
@@ -475,9 +470,10 @@ template<typename T, typename Function>
 Queue<T> filter(const Queue<T> &queue, Function functionPtr) {
     Queue<T> resultQueue;
     for (typename Queue<T>::ConstIterator it = queue.begin(); it != queue.end(); ++it) {
-        if (functionPtr(*it)) {
+        T value = *it;
+        if (functionPtr(value)) {
             try {
-                resultQueue.pushBack(*it);
+                resultQueue.pushBack(value);
             } catch (std::bad_alloc &e) {
                 throw std::bad_alloc();
             }
