@@ -8,16 +8,36 @@ class HealthPoints
 {
 
 public:
-    /*c'tor for the class HealthPoints.
-    *@param: maxHPInput: implemented as the max Health Points possible 
-    * and as the starting amount of current points
-    * 
+
+    /*overloading the << operator o print an HealthPoints object in the following pattern:
+    * (current hp, max hp)
+    *
     */
     friend std::ostream& operator<<(std::ostream& os, const HealthPoints& healthPoints);
 
-    HealthPoints(int maxHP = 100);
+    /*c'tor for the class HealthPoints.
+    *@param: maxHPInput: implemented as the max Health Points possible
+    * and as the starting amount of current points
+    *
+    * throws InvalidArgument exeption if the value given is <= 0
+    *
+    */
+    HealthPoints(int maxHealthPoints = 100);
+
+    /*copy c'tor for the class HealthPoints.
+    *@param: healthPointsToCopy: HealthPoints object to copy
+    *
+    */
     HealthPoints(const HealthPoints& healthPointsToCopy);
-    HealthPoints&operator=(const HealthPoints& healthPointsToCopy);
+
+
+    HealthPoints&operator=(const HealthPoints& healthPointsToCopy)=default;
+
+    /*
+    * InvalidArgument exception.
+    * this exception will be thrown when when trying to give
+    * health points a value that isn't positive
+    */
     class InvalidArgument : public std::exception
     {
     public:
@@ -28,41 +48,210 @@ public:
     };
     ~HealthPoints()=default;
 
-    HealthPoints operator+(const int numOfHpPoints) const ;
+    /*
+   *
+   * overloading operator+ with an int object, so it will operate
+   * with the m_currentHealthpoints field
+   *
+   * @param: numOfHealthPoints: number of hp to calculate with
+   */
+    HealthPoints operator+(const int numOfHealthPoints) const ;
 
-    HealthPoints operator-(const int numOfHpPoints) ;
+    /*
+    * overloading operator- with an int object, so it will operate
+    * with the m_currentHealthpoints field
+    *
+    * @param: numOfHealthPoints: number of hp to calculate with
+    */
+    HealthPoints operator-(const int numOfHealthPoints) ;
 
-    HealthPoints& operator+=(const int numOfHpPoints);
+    /*
+    * overloading operator+= with an int object, so it will operate
+    * with the m_currentHealthpoints field
+    *
+    * @param: numOfHealthPoints: number of hp to calculate with
+    */
+    HealthPoints& operator+=(const int numOfHealthPoints);
 
-    HealthPoints& operator-=(const int numOfHpPoints);
+    /*
+    * overloading operator-= with an int object, so it will operate
+    * with the m_currentHealthpoints field
+    *
+    * @param: numOfHealthPoints: number of hp to calculate with
+    */
+    HealthPoints& operator-=(const int numOfHealthPoints);
 
-    HealthPoints& operator=(const int numOfHpPoints);
+    /*
+    * overloading operator= with an int object, so it will operate
+    * with the m_currentHealthpoints field
+    *
+    * @param: numOfHealthPoints: number of hp to calculate with
+    */
+    HealthPoints& operator=(const int numOfHealthPoints);
 
+    /*
+    * overloading operator== with a HealthPoints object, the operator
+    * will compare both fields of the objects
+    *
+    * @param: otherHealthPoints: HealthPoints object to compare with
+    */
     bool operator==(const HealthPoints& otherHealthPoints) const;
-    bool operator==(const int numOfHpPoints) const;
 
+    /*
+    * overloading operator== with an int object, so it will operate
+    * with the m_currentHealthpoints field
+    *
+    * @param: numOfHealthPoints: number of hp to calculate with
+    */
+    bool operator==(const int numOfHealthPoints) const;
+
+    /*
+    * overloading operator!= with a HealthPoints object, the operator
+    * will compare both fields of the objects
+    *
+    * @param: otherHealthPoints: HealthPoints object to compare with
+    */
     bool operator!=(const HealthPoints& otherHealthPoints) const;
-    bool operator!=(const int numOfHpPoints) const;
 
+    /*
+    * overloading operator!= with an int object, so it will operate
+    * with the m_currentHealthpoints field
+    *
+    * @param: numOfHealthPoints: number of hp to calculate with
+    */
+    bool operator!=(const int numOfHealthPoints) const;
+
+    /*
+    * overloading operator>= with a HealthPoints object, the operator
+    * will compare both fields of the objects
+    *
+    * @param: otherHealthPoints: HealthPoints object to compare with
+    */
     bool operator>=(const HealthPoints& otherHealthPoints) const;
-    bool operator>=(const int numOfHpPoints) const;
 
+    /*
+    * overloading operator>= with an int object, so it will operate
+    * with the m_currentHealthpoints field
+    *
+    * @param: numOfHealthPoints: number of hp to calculate with
+    */
+    bool operator>=(const int numOfHealthPoints) const;
+
+    /*
+    * overloading operator<= with a HealthPoints object, the operator
+    * will compare both fields of the objects
+    *
+    * @param: otherHealthPoints: HealthPoints object to compare with
+    */
     bool operator<=(const HealthPoints& otherHealthPoints) const;
-    bool operator<=(const int numOfHpPoints) const;
 
+    /*
+    * overloading operator<= with an int object, so it will operate
+    * with the m_currentHealthpoints field
+    *
+    * @param: numOfHealthPoints: number of hp to calculate with
+    */
+    bool operator<=(const int numOfHealthPoints) const;
+
+    /*
+    * overloading operator< with a HealthPoints object, the operator
+    * will compare both fields of the objects
+    *
+    * @param: otherHealthPoints: HealthPoints object to compare with
+    */
     bool operator<(const HealthPoints& otherHealthPoints) const;
-    bool operator<(const int numOfHpPoints) const;
 
+    /*
+    * overloading operator< with an int object, so it will operate
+    * with the m_currentHealthpoints field
+    *
+    * @param: numOfHealthPoints: number of hp to calculate with
+    */
+    bool operator<(const int numOfHealthPoints) const;
+
+    /*
+    * overloading operator> with a HealthPoints object, the operator
+    * will compare both fields of the objects
+    *
+    * @param: otherHealthPoints: HealthPoints object to compare with
+    */
     bool operator>(const HealthPoints& otherHealthPoints) const;
-    bool operator>(const int numOfHpPoints) const;
+
+    /*
+    * overloading operator> with an int object, so it will operate
+    * with the m_currentHealthpoints field
+    *
+    * @param: numOfHealthPoints: number of hp to calculate with
+    */
+    bool operator>(const int numOfHealthPoints) const;
 
 private:
-    int m_currentHp;
-    int m_maxHp;
+    int m_currentHealthpoints;
+    int m_maxHealthpoints;
 };
-HealthPoints operator+(const int numOfHpPoints,  const HealthPoints& healthPoint);//check
+
+/*
+* overloading operator+ with an int object on the left, so it will operate
+* with the m_currentHealthpoints field
+*
+* @param: numOfHealthPoints: number of hp to calculate with
+* @param: healthPoint: healthPoint to calculate with
+*/
+HealthPoints operator+(const int numOfHealthPoints,  const HealthPoints& healthPoint);
+
+/*
+* overloading operator> with an int object on the left, so it will operate
+* with the m_currentHealthpoints field
+*
+* @param: numOfHealthPoints: number of hp to calculate with
+* @param: healthPoint: healthPoint to calculate with
+*/
+bool operator>(int number, const HealthPoints &healthPoints);
+
+/*
+* overloading operator< with an int object on the left, so it will operate
+* with the m_currentHealthpoints field
+*
+* @param: numOfHealthPoints: number of hp to calculate with
+* @param: healthPoint: healthPoint to calculate with
+*/
+bool operator<(int number, const HealthPoints &healthPoints);
 
 
+/*
+* overloading operator<= with an int object on the left, so it will operate
+* with the m_currentHealthpoints field
+*
+* @param: numOfHealthPoints: number of hp to calculate with
+* @param: healthPoint: healthPoint to calculate with
+*/
+bool operator<=(int number, const HealthPoints &healthPoints);
+
+
+/*
+* overloading operator>= with an int object on the left, so it will operate
+* with the m_currentHealthpoints field
+*
+* @param: numOfHealthPoints: number of hp to calculate with
+* @param: healthPoint: healthPoint to calculate with
+*/
+bool operator>=(int number, const HealthPoints &healthPoints);
+
+/*
+* overloading operator!= with an int object on the left, so it will operate
+* with the m_currentHealthpoints field
+*
+* @param: numOfHealthPoints: number of hp to calculate with
+* @param: healthPoint: healthPoint to calculate with
+*/
+bool operator!=(int number, const HealthPoints &healthPoints);
+
+/*
+* overloading operator == with an int object on the left, so it will operate
+* with the m_currentHealthpoints field
+*
+* @param: numOfHealthPoints: number of hp to calculate with
+* @param: healthPoint: healthPoint to calculate with
+*/
 bool operator==(int number, const HealthPoints &healthPoints);
-
 #endif
